@@ -294,9 +294,9 @@ def split_train_test_with_target_balance(df: pl.DataFrame, target_col: str = "ta
     df_train = df.filter(~pl.col("case_id").is_in(df_test["case_id"]))
 
 
-    df_test.write_csv("data/test_data.csv")
-    df_train.write_csv("data/train_data.csv")
-    print("save test_data.csv and train_data.csv")
+    df_test.write_parquet("test_data.parquet")
+    df_train.write_parquet("train_data.parquet")
+    print("Saved test_data.parquet and train_data.parquet")
 
 df_base = pl.read_parquet('data/base_data.parquet')
 df_base_cleaned = clean_base_data(df_base)
