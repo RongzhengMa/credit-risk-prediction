@@ -22,7 +22,7 @@ Evaluation: Model performance is assessed using ROC AUC, Precision-Recall AUC, F
 **Best F1 Threshold**: 0.5989  
 **Accuracy**:  0.7539  
 **Precision**: 0.0257  
-**Recall**:    0.6400
+**Recall**:    0.6400<br>
 **F1 Score**:  0.0494
 
 ### Feature Selection: Lasso
@@ -45,13 +45,15 @@ The ROC AUC on the test set is **0.7981**, showing solid separability between de
 
 ### Evaluation: Precision-Recall Curve
 
-Precision is low, but recall is high. This is expected due to class imbalance and conservative thresholding.
+The Precision-Recall (PR) curve shows a steep drop-off in precision even at low recall values. The PR AUC is **0.0403**, indicating poor performance in identifying true positive events under class imbalance. This suggests the model may need further calibration or alternative resampling methods (e.g., SMOTE, ensemble techniques) to improve its effectiveness in real-world imbalanced data scenarios.
 
 ![PR Curve](visualizations/svm_PR_curve.png)
 
 ### Threshold Tuning
 
-F1 score peaks at threshold = **0.0494**.
+This chart helps identify the optimal decision threshold that balances precision and recall by maximizing the F1 score.  
+The F1 score peaks at a threshold of **0.0494**.
+While threshold tuning slightly improves performance, the overall F1 score remains low, suggesting challenges in precision-recall tradeoff under class imbalance.
 
 ![F1 vs Threshold](visualizations/svm_F1_score.png)
 
