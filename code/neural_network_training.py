@@ -1,3 +1,6 @@
+# ===============================
+# Imports and Dependencies
+# ===============================
 import os
 import numpy as np
 import pandas as pd
@@ -7,26 +10,28 @@ import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import ADASYN
-
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation
 from tensorflow.keras.metrics import AUC
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from tensorflow.keras.utils import register_keras_serializable
 from tensorflow.keras.losses import Loss
-from tensorflow.keras import backend as K
-from tensorflow.keras import regularizers
+from tensorflow.keras import backend as K, regularizers
+from tensorflow.keras.utils import register_keras_serializable
 
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.pipeline import Pipeline 
-
+# ===============================
+# Custom Loss and Metric Functions
+# ===============================
 
 @register_keras_serializable()
 class BinaryFocalLoss(Loss):
-    def __init__(self, gamma=2.0, alpha=0.7, **kwargs):
+    """Custom focal loss for binary classification."""
+    def __init__(self, gamma=2.5, alpha=0.7, **kwargs):
         super().__init__(**kwargs)
         self.gamma = gamma
         self.alpha = alpha
@@ -40,9 +45,10 @@ class BinaryFocalLoss(Loss):
 
     def get_config(self):
         return {"gamma": self.gamma, "alpha": self.alpha}
-    
+
 @register_keras_serializable()
 class F1Score(tf.keras.metrics.Metric):
+    """Custom F1 score metric for model evaluation."""
     def __init__(self, name='f1_score', threshold=0.5, **kwargs):
         super().__init__(name=name, **kwargs)
         self.threshold = threshold
@@ -70,48 +76,53 @@ class F1Score(tf.keras.metrics.Metric):
     def get_config(self):
         return {'threshold': self.threshold}
 
-
+# ===============================
+# Data Loading and Preprocessing
+# ===============================
 df = pd.read_parquet("../data/train_data.parquet")
 
-
+# Label encode categorical columns
 categorical_cols = df.select_dtypes(include=["object"]).columns
 for col in categorical_cols:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col].astype(str))
 
-
+# Separate features and target
 drop_cols = ["case_id", "date_decision", "target"]
 X = df.drop(columns=drop_cols)
 y = df["target"]
 
-
-print("Lab Distribution:")
+print("Label Distribution:")
 print(y.value_counts())
 
-
+# ===============================
+# Train-Test Split and Resampling
+# ===============================
 X_train_raw, X_test_raw, y_train_raw, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42
 )
 
-
+# Pipeline: under-sample then over-sample
 pipeline = Pipeline([
-    ('undersample', RandomUnderSampler(sampling_strategy=0.2, random_state=42)),  
-    ('oversample', ADASYN(sampling_strategy=0.5, random_state=42))                
+    ('undersample', RandomUnderSampler(sampling_strategy=0.2, random_state=42)),
+    ('oversample', ADASYN(sampling_strategy=0.5, random_state=42))
 ])
 X_train_resampled, y_train_resampled = pipeline.fit_resample(X_train_raw, y_train_raw)
 
-
+# ===============================
+# Feature Scaling and Save Scaler
+# ===============================
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train_resampled).astype(np.float32)
 X_test_scaled = scaler.transform(X_test_raw).astype(np.float32)
-
 joblib.dump(scaler, "../output/model/scaler.pkl")
-
 
 y_train = y_train_resampled.astype(np.float32)
 y_test = y_test.astype(np.float32)
 
-
+# ===============================
+# Model Architecture and Compilation
+# ===============================
 model = Sequential([
     Dense(64, kernel_regularizer=regularizers.l2(1e-4)),
     BatchNormalization(),
@@ -126,21 +137,18 @@ model = Sequential([
     Dense(1, activation='sigmoid')
 ])
 
-
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
     loss=BinaryFocalLoss(gamma=2.0, alpha=0.7),
     metrics=[F1Score(name='f1_score'), AUC(name="auc")]
 )
 
-
-rlr = ReduceLROnPlateau(monitor='val_f1_score', factor=0.1, patience=5,
-                        verbose=1, min_delta=1e-4, mode='max')
-
+# ===============================
+# Training with Callbacks
+# ===============================
+rlr = ReduceLROnPlateau(monitor='val_f1_score', factor=0.1, patience=5, verbose=1, mode='max')
 early_stop = EarlyStopping(monitor='val_f1_score', mode='max', patience=5, restore_best_weights=True)
-
-checkpoint = ModelCheckpoint("../output/model/nn_best_model.keras",
-                             monitor='val_f1_score', mode='max', save_best_only=True)
+checkpoint = ModelCheckpoint("../output/model/nn_best_model.keras", monitor='val_f1_score', mode='max', save_best_only=True)
 
 history = model.fit(
     X_train_scaled, y_train,
@@ -151,7 +159,9 @@ history = model.fit(
     verbose=1
 )
 
-
+# ===============================
+# Training Performance Visualization
+# ===============================
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
 plt.plot(history.history['loss'], label='Train Loss')
@@ -172,64 +182,27 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-
-
-
-
-
-
-
-y_train_true = y_train_resampled
-X_train_input = X_train_scaled  
-
-
-y_train_pred_prob = model.predict(X_train_input).flatten()
-
-
-pos_probs = y_train_pred_prob[y_train_true == 1]
-
-
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(7, 5))
-plt.hist(pos_probs, bins=50, color='skyblue', edgecolor='black')
-plt.axvline(0.5, color='red', linestyle='--', label='Threshold = 0.5')
-plt.title("Distribution of Predicted Probabilities for Positive Class (Train Set)")
-plt.xlabel("Predicted Probability")
-plt.ylabel("Count")
-plt.legend()
-plt.tight_layout()
-plt.show()
-
-
-
-
-
-
-
-import numpy as np
-import pandas as pd
-
+# ===============================
+# Economic Index Calculation
+# ===============================
 epsilon = 1e-6
-
 df['EAD'] = df['residualamount_856A_mean'] + df['currdebt_22A']
 df['LGD'] = 1 - df['collater_valueofguarantee_1124L_sum'] / (df['EAD'] + epsilon)
 df['LGD'] = df['LGD'].clip(lower=0, upper=1)
 
-alpha1 = 0.02
-alpha2 = 0.001
+# PD estimation using a simple logistic function
+alpha1, alpha2 = 0.02, 0.001
 linear_score = (
     alpha1 * df['maxdpdlast6m_474P'].fillna(0) +
     alpha2 * df['pmts_overdue_1140A_mean'].fillna(0)
 )
 df['PD'] = 1 / (1 + np.exp(-linear_score))
-df['ELI_raw'] = df['EAD'] * df['LGD'] * df['PD']
-min_eli, max_eli = df['ELI_raw'].min(), df['ELI_raw'].max()
-df['ELI'] = (df['ELI_raw'] - min_eli) / (max_eli - min_eli + epsilon)
 
+# Loss and benefit index
+df['ELI_raw'] = df['EAD'] * df['LGD'] * df['PD']
+df['ELI'] = (df['ELI_raw'] - df['ELI_raw'].min()) / (df['ELI_raw'].max() - df['ELI_raw'].min() + epsilon)
 df['BI_raw'] = df['residualamount_856A_mean'] * df['nominalrate_281L_max']
-min_bi, max_bi = df['BI_raw'].min(), df['BI_raw'].max()
-df['BI'] = (df['BI_raw'] - min_bi) / (max_bi - min_bi + epsilon)
+df['BI'] = (df['BI_raw'] - df['BI_raw'].min()) / (df['BI_raw'].max() - df['BI_raw'].min() + epsilon)
 
 summary = df.groupby('target').agg({
     'ELI': 'mean',
@@ -241,39 +214,34 @@ summary.columns = ['Avg_Loss_Index (ELI)', 'Avg_Benefit_Index (BI)', 'User_Count
 print("Average economic impact by customer type:")
 print(summary)
 
-results = df[['case_id', 'target', 'ELI', 'BI']]
+# ===============================
+# Optimal Threshold Search Based on Economic Cost
+# ===============================
 
-avg_loss = summary.loc['Bad User (1)', 'Avg_Loss_Index (ELI)']
-avg_benefit = summary.loc['Good User (0)', 'Avg_Benefit_Index (BI)']
-break_even_good_ratio = avg_loss / (avg_benefit + avg_loss + epsilon)
-
-print(f"\n Minimum required proportion of good users for break-even: {break_even_good_ratio:.2%}")
-
-
-
-
-
-
-from sklearn.metrics import confusion_matrix
-import numpy as np
+# Use calculated average indices from Economic Index Calculation
+avg_benefit_per_good = summary.loc['Good User (0)', 'Avg_Benefit_Index (BI)']
+avg_loss_per_bad = summary.loc['Bad User (1)', 'Avg_Loss_Index (ELI)']
 
 thresholds = np.linspace(0.00, 1.00, 1000)
-
-profit_per_good = 0.026243 * 10000
-loss_per_bad = 0.054642 * 10000
 
 min_total_cost = float('inf')
 best_threshold = None
 
+y_train_pred_prob = model.predict(X_train_scaled).flatten()
+
+# Grid search to minimize expected economic cost
 for thresh in thresholds:
     y_pred = (y_train_pred_prob >= thresh).astype(int)
     tn, fp, fn, tp = confusion_matrix(y_train, y_pred).ravel()
-    cost = fp * profit_per_good + fn * loss_per_bad
+    
+    # Economic cost: false positives lose potential benefit, false negatives incur actual loss
+    cost = fp * avg_benefit_per_good + fn * avg_loss_per_bad
 
     if cost < min_total_cost:
         min_total_cost = cost
         best_threshold = thresh
 
-print(f" Optimal threshold minimizing economic cost: {best_threshold:.3f}")
-print(f" Minimum total cost: ${min_total_cost:,.0f}")
+# Display result
+print(f"Optimal threshold minimizing economic cost: {best_threshold:.3f}")
+print(f"Minimum total cost (normalized units): {min_total_cost:.6f}")
 
