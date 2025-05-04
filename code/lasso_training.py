@@ -68,7 +68,7 @@ joblib.dump(sfm, os.path.join(model_dir, "feature_selector.pkl"))
 joblib.dump(svm, os.path.join(model_dir, "linear_svc.pkl"))
 np.save(os.path.join(model_dir, "selected_feature_mask.npy"), sfm.get_support())
 
-print("✅ 所有模型保存成功：")
+print("✅ successful：")
 print("- scaler.pkl")
 print("- lasso.pkl")
 print("- feature_selector.pkl")
