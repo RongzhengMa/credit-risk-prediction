@@ -12,6 +12,7 @@ from sklearn.metrics import (
     roc_curve, precision_recall_curve, average_precision_score
 )
 
+
 # ===============================
 # Load Model Components
 # ===============================
@@ -124,3 +125,17 @@ plt.ylabel("Count")
 plt.legend()
 plt.tight_layout()
 plt.show()
+
+df_preds = pd.DataFrame({
+    "case_id": df_test["case_id"].values,
+    "score": y_scores.flatten(),
+    "predicted_label": y_pred.flatten(),
+    "actual_label": y_true.values
+})
+
+# 保存完整预测结果
+df_preds.to_csv("result/submission_lasso_svm.csv", index=False)
+
+
+print("saved：")
+print("- result/submission_lasso_svm.csv")
