@@ -71,9 +71,9 @@ To reflect this, we define two economic indices:
 
 * **Benefit Index (BI)** for good users:
 
-  $$
-  \text{BI} = \text{Loan Amount} \times \text{Interest Rate}
-  $$
+$$
+\text{BI} = \text{Loan Amount} \times \text{Interest Rate}
+$$
 
 Using these, we select the prediction threshold that minimizes total expected cost:
 
