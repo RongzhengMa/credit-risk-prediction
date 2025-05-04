@@ -98,7 +98,7 @@ Training stopped at **epoch 48** with automatic learning rate reduction. Final m
 * **Validation Loss**: 0.0332
 
 <p align="center">
-  <img src="../visualizations/nn_training_results.png" width="600">
+  <img src="visualizations/nn_training_results.png" width="600">
 </p>
 
 ---
@@ -127,8 +127,8 @@ We used expected loss (ELI) and benefit (BI) to reflect real-world costs:
 * **PR AUC**: 0.0526
 
 <p align="center">
-  <img src="../visualizations/nn_confusion_matrix.png" width="320">
-  <img src="../visualizations/nn_roc_curve.png" width="320">
+  <img src="visualizations/nn_confusion_matrix.png" width="320">
+  <img src="visualizations/nn_roc_curve.png" width="320">
 </p>
 
 ---
@@ -140,8 +140,8 @@ We used expected loss (ELI) and benefit (BI) to reflect real-world costs:
 * Prediction probabilities are mostly concentrated between 0.45 and 0.65
 
 <p align="center">
-  <img src="../visualizations/nn_f1_score.png" width="300">
-  <img src="../visualizations/nn_prediction_distribution.png" width="400">
+  <img src="visualizations/nn_f1_score.png" width="300">
+  <img src="visualizations/nn_prediction_distribution.png" width="400">
 </p>
 
 ### 5. Final Note
