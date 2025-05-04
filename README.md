@@ -1,4 +1,32 @@
 # credit-risk-prediction
+## What is Lasso + SVC?
+This model pipeline combines Lasso regression for feature selection with Linear Support Vector Classification (LinearSVC) for prediction. It is designed to handle high-dimensional, imbalanced classification problems efficiently.
+Lasso acts as a filter to automatically drop irrelevant features by penalizing their coefficients, shrinking many of them to zero. The reduced feature set is then used by LinearSVC, which is optimized for speed and scalability on large datasets. By combining the two, we achieve both interpretability and efficient computation — critical for real-world applications like credit risk scoring.
+
+## Core Components
+Feature Selection with Lasso: Lasso (L1 regularization) shrinks less important feature coefficients to zero, effectively selecting a sparse subset of predictors.<br>
+
+Classifier: LinearSVC: A fast linear support vector machine optimized for large-scale classification, well-suited for imbalanced data when paired with class weights.<br>
+
+Undersampling: Reduces the majority class to balance the training distribution.<br>
+
+Standardization: All features are scaled to zero mean and unit variance to stabilize SVM optimization.<br>
+
+Evaluation: Model performance is assessed using ROC AUC, Precision-Recall AUC, F1 score, and a confusion matrix.<br>
+
+## Model Summary
+**Lasso Selected Features**: 41  
+**Classifier**: LinearSVC(class_weight='balanced', max_iter=1000)  
+**LinearSVC ROC AUC**: 0.7810  
+**Best F1 Threshold**: 0.4111  
+**Accuracy**:  0.7507  
+**Precision**: 0.0823  
+**Recall**:    0.6651  
+**F1 Score**:  0.1465  
+
+
+
+
 ## What Is a Neural Network?
 
 A neural network is a type of machine learning model loosely inspired by the human brain. Just as the brain uses networks of neurons to process signals, artificial neural networks use layers of interconnected units to process data and make decisions.
@@ -147,3 +175,4 @@ We used expected loss (ELI) and benefit (BI) to reflect real-world costs:
 ### 5. Final Note
 
 Although the model has limited precision due to class imbalance, the integration of economic cost analysis helps compensate for this by shifting the decision threshold toward minimizing actual financial loss. This allows the model to remain useful in practice, even when statistical metrics alone appear suboptimal.
+
