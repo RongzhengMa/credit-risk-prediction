@@ -262,9 +262,10 @@ The pipeline works in two stages: First, DNN and LightGBM independently learn di
 ### **Key Performance Characteristics**
 
 The stacked model achieves:
-- **Highest recall among all models** (0.36 vs LightGBM's 0.23 and DNN's 0.39)
-- **Moderate false positive reduction** (641 vs DNN's 918)
-- **Higher precision than DNN** but lower than LightGBM
+- **Acceptable recall among all models** (0.36 vs LightGBM's 0.23 and DNN's 0.39)
+- **Significant false positive reduction** (641 vs DNN's 918)
+- **Highest AUC-PR** 
+- **Highest F1 Score**
 
 ### Evaluation: Confusion Matrix
 
@@ -292,7 +293,7 @@ Individual components and stacked ensemble performance comparison:
 |-------|---------|--------|-----------|--------|----------|-----|
 | LightGBM | 0.8403 | 0.0497 | 0.0515 | 0.2300 | 0.0841 | 77% |
 | DNN | 0.7861 | 0.0386 | 0.0408 | 0.3900 | 0.0738 | 61% |
-| Stacked | 0.8421 | 0.0551 | 0.0532 | 0.3600 | 0.0927 | 64% |
+| Stacked | **0.8421** | **0.0551** | **0.0532** | 0.3600 | **0.0927** | 64% |
 
 **Training Set Performance**:
 | Model | ROC AUC | PR AUC | Precision | Recall | F1 Score | FNR |
@@ -319,9 +320,10 @@ The meta-model enables sophisticated threshold tuning:
 **Strategic Balance**:
 
 1. **False Positive Reduction**: From DNN's 918 to Stacked's 641 (30% improvement)
-2. **Recall Improvement**: Better than LightGBM at 36% vs 23%
-3. **ROC Performance**: Best among all models (0.8421)
-4. **Practical Trade-off**: Balances precision and recall effectively
+2. **Highest AUC-PR**: Improved by 10.9% (vs LightGBM's 0.0497)
+3. **Highest F1**
+4. **Highest AUC-ROC Performance**: Best among all models (0.8421)
+5. **Practical Trade-off**: Balances precision and recall effectively
 
 **Cost Analysis**:
 - False Positives: Better than DNN, slightly worse than LightGBM
@@ -334,14 +336,14 @@ The DNN + LightGBM + Logistic Stack represents a balanced credit risk approach. 
 
 **Strengths**:
 - **Highest ROC AUC** (0.8421) among all models
-- **Best recall** while maintaining reasonable precision
+- **Great Accuracy and acceptable Recall with less Fewer Positive cases** while maintaining reasonable precision
 - Superior generalization (minimal performance drop from training to test)
 - Optimal balance for practical deployment
 
 **Considerations**:
 - Higher false positives than LightGBM (but fewer than DNN)
-- More complex infrastructure than single models
-- Excellent overall performance justifies complexity
+- Room to improve false negative rates
+- More complex infrastructure than single models,indicating longer fine-tuning time
 
 This ensemble approach delivers the best overall performance, making it ideal for institutions seeking optimal balance between risk management and market opportunity.
 
