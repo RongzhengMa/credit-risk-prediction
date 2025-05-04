@@ -63,8 +63,7 @@ While threshold tuning slightly improves performance, the overall F1 score remai
 
 Histogram of decision scores for the positive class shows most scores clustered near zero. This indicates the classifier is often uncertain when predicting rare default events, reinforcing the importance of careful threshold calibration.
 
-![Score Histogram](visualizations/svm_decision_function_scores)
-
+![Score Histogram](visualizations/svm_decision_function_scores.png.png)
 ### Conclusion
 This modeling pipeline combines Lasso regression for feature selection with a Linear Support Vector Classifier (LinearSVC) to predict credit default events in a highly imbalanced dataset. Lasso selected 41 informative features out of 63, helping reduce noise and improve model generalization. ROC curves show that the model has good discrimination capability (AUC = 0.7810), but the precision-recall curve (PR AUC = 0.0403) reveals difficulty in precisely identifying true positive cases due to class imbalance. Threshold tuning improves recall significantly (up to 64%), but this comes at the cost of very low precision, highlighting a high false positive rate. Lasso feature coefficients help interpret key risk factors, and the distribution of decision scores shows many predictions close to the decision boundary, underlining the importance of threshold calibration. Overall, the model is effective at detecting rare default events with high recall—valuable in risk-sensitive scenarios—but further techniques such as cost-sensitive learning, re-sampling, or ensemble methods are needed to improve precision and reduce false alarms.
 
