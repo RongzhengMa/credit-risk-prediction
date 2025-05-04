@@ -1,9 +1,10 @@
 # credit-risk-prediction
-## What is Lasso + SVC?
+## Lasso + SVC
+### What is Lasso + SVC?
 This model pipeline combines Lasso regression for feature selection with Linear Support Vector Classification (LinearSVC) for prediction. It is designed to handle high-dimensional, imbalanced classification problems efficiently.
 Lasso acts as a filter to automatically drop irrelevant features by penalizing their coefficients, shrinking many of them to zero. The reduced feature set is then used by LinearSVC, which is optimized for speed and scalability on large datasets. By combining the two, we achieve both interpretability and efficient computation — critical for real-world applications like credit risk scoring.
 
-## Core Components
+### Core Components
 Feature Selection with Lasso: Lasso (L1 regularization) shrinks less important feature coefficients to zero, effectively selecting a sparse subset of predictors.<br>
 
 Classifier: LinearSVC: A fast linear support vector machine optimized for large-scale classification, well-suited for imbalanced data when paired with class weights.<br>
@@ -14,7 +15,7 @@ Standardization: All features are scaled to zero mean and unit variance to stabi
 
 Evaluation: Model performance is assessed using ROC AUC, Precision-Recall AUC, F1 score, and a confusion matrix.<br>
 
-## Model Summary
+### Model Summary
 **Lasso Selected Features**: 41  
 **Classifier**: LinearSVC(class_weight='balanced', max_iter=1000)  
 **LinearSVC ROC AUC**: 0.7810  
@@ -24,7 +25,46 @@ Evaluation: Model performance is assessed using ROC AUC, Precision-Recall AUC, F
 **Recall**:    0.6651  
 **F1 Score**:  0.1465  
 
+### Feature Selection: Lasso
 
+We used Lasso to select the most informative features. It selected 41 features. Below is the bar chart of selected feature coefficients:
+
+![Lasso Feature Coefficients](visualizations/lasso_features.png)
+
+### Evaluation: Confusion Matrix
+
+The confusion matrix shows that while false positives are high, the model successfully identifies most default cases (recall ≈ 66.5%).
+
+![Confusion Matrix](visualizations/svm_confusion_matrix.png)
+
+### Evaluation: ROC Curve
+
+The ROC AUC on the test set is **0.78**, showing solid separability between default and non-default cases.
+
+![ROC Curve](visualizations/svm_roc_lasso_selected.png)
+
+### Evaluation: Precision-Recall Curve
+
+Precision is low, but recall is high. This is expected due to class imbalance and conservative thresholding.
+
+![PR Curve](visualizations/svm_PR_curve.png)
+
+### Threshold Tuning
+
+F1 score peaks at threshold = **0.4111**, not the default 0.0. This balance improves rare event detection.
+
+![F1 vs Threshold](visualizations/svm_F1_score.png)
+
+---
+
+### Prediction Distribution
+
+Below is the distribution of decision scores for the positive class.
+
+![Score Histogram](visualizations/svm_decision_function_scores.png)
+
+### Conclusion
+This modeling pipeline combines Lasso regression for feature selection with a Linear Support Vector Classifier (LinearSVC) to predict credit default events in a highly imbalanced dataset. Lasso selected 41 informative features out of 63, helping reduce noise and improve model generalization. ROC and PR Curves indicate the model performs reasonably well in distinguishing classes, but struggles with precision due to class imbalance. Threshold tuning significantly improves recall while balancing economic cost.Lasso feature coefficients highlight key risk drivers.Prediction distribution shows most decision scores are near the threshold, emphasizing the need for careful cutoff selection.The model effectively identifies rare default events with high recall, crucial in risk-sensitive applications. However, low precision means further strategies (e.g., cost-aware loss functions, ensemble models) may be needed to reduce false positives.
 
 
 ## What Is a Neural Network?
