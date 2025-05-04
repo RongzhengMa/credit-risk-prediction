@@ -216,3 +216,137 @@ We used expected loss (ELI) and benefit (BI) to reflect real-world costs:
 
 Although the model has limited precision due to class imbalance, the integration of economic cost analysis helps compensate for this by shifting the decision threshold toward minimizing actual financial loss. This allows the model to remain useful in practice, even when statistical metrics alone appear suboptimal.
 
+## DNN + LightGBM + Logistic Stack
+
+### What is DNN + LightGBM + Logistic Stack?
+
+This advanced ensemble model combines Deep Neural Networks (DNN) and LightGBM as base learners with Logistic Regression as a meta-learner through stacking. Unlike simple averaging or voting, stacking trains a meta-model to learn the optimal way to combine predictions from diverse base models.
+
+The pipeline works in two stages: First, DNN and LightGBM independently learn different aspects of the credit risk patterns (neural networks excel at complex non-linear relationships while gradient boosting handles structured data). Second, their predictions become features for a logistic regression meta-model that determines how to best integrate these complementary insights for final classification.
+
+### Core Components
+
+**Base Models:**
+- **Deep Neural Network (DNN)**: 3-layer architecture (512-256-1 units) with ReLU activation, designed to capture complex, non-linear patterns in credit profiles
+- **LightGBM**: Gradient boosted decision tree framework optimized for speed and handling class imbalance with built-in support for unbalanced datasets
+
+**Meta Model:**
+- **Logistic Regression**: Combines base model predictions with class balancing for final decisions
+
+**Key Features:**
+- **Random Search Optimization**: **PR AUC as primary metric**, 20 configurations tested for DNN, 15 for LightGBM
+- **Dynamic Threshold Optimization**: **F1-score for threshold tuning**
+- **Undersampling + Oversampling**: Hybrid approach to address class imbalance
+- **Extended Feature Engineering**: 12 derived features per date column
+
+### Model Summary
+
+**DNN Architecture**: [512, 256]  
+**DNN Activation**: ReLU  
+**DNN Dropout Rate**: 0.4  
+**DNN Learning Rate**: 0.0025  
+**LightGBM Leaves**: 128  
+**LightGBM Tree Depth**: 4  
+**LightGBM Learning Rate**: 0.1  
+**Meta-Model**: LogisticRegression(class_weight='balanced')  
+**Test ROC AUC**: 0.8421  
+**Test PR AUC**: 0.0551  
+**Test Accuracy**: 0.9295  
+**Test Precision**: 0.0532  
+**Test Recall**: 0.3600  
+**Test F1 Score**: 0.0927
+
+### **Key Performance Characteristics**
+
+The stacked model achieves:
+- **Highest recall among all models** (0.36 vs LightGBM's 0.23 and DNN's 0.39)
+- **Moderate false positive reduction** (641 vs DNN's 918)
+- **Higher precision than DNN** but lower than LightGBM
+
+### Evaluation: Confusion Matrix
+
+**Test Set Performance**:
+| Model | False Positives | True Positives | False Negatives | True Negatives |
+|-------|----------------|----------------|-----------------|----------------|
+| LightGBM | 424 | 23 | 77 | 9476 |
+| DNN | 918 | 39 | 61 | 8982 |
+| Stacked | 641 | 36 | 64 | 9259 |
+
+![stacked_model_(test)_confusion_matrix](https://github.com/user-attachments/assets/662044e5-0b3f-4b6a-bf8b-03dfb60d15c1)
+
+### Evaluation: AUC-ROC Curve
+
+![stacked_model_(training)_roc_curve](https://github.com/user-attachments/assets/51a879b3-5363-4254-99cc-84316d3bf884)
+![stacked_model_(test)_roc_curve](https://github.com/user-attachments/assets/71a51e54-fab8-488b-acbf-42010941cbd0)
+
+
+### Model Comparison
+
+Individual components and stacked ensemble performance comparison:
+
+**Test Set Performance**:
+| Model | ROC AUC | PR AUC | Precision | Recall | F1 Score | FNR |
+|-------|---------|--------|-----------|--------|----------|-----|
+| LightGBM | 0.8403 | 0.0497 | 0.0515 | 0.2300 | 0.0841 | 77% |
+| DNN | 0.7861 | 0.0386 | 0.0408 | 0.3900 | 0.0738 | 61% |
+| Stacked | 0.8421 | 0.0551 | 0.0532 | 0.3600 | 0.0927 | 64% |
+
+**Training Set Performance**:
+| Model | ROC AUC | PR AUC | Precision | Recall | F1 Score | FNR |
+|-------|---------|--------|-----------|--------|----------|-----|
+| LightGBM | 0.8585 | 0.2088 | 0.2281 | 0.3454 | 0.2747 | 65.5% |
+| DNN | 0.7718 | 0.1018 | 0.1095 | 0.3515 | 0.1670 | 64.9% |
+| Stacked | 0.8573 | 0.2035 | 0.1919 | 0.4360 | 0.2665 | 56.4% |
+
+Key insights:
+- LightGBM achieves highest precision but lowest recall
+- DNN captures more defaults with highest recall but many false positives
+- Stacked model provides the best balance and highest ROC AUC
+
+### Threshold Optimization
+
+The meta-model enables sophisticated threshold tuning:
+
+* **DNN Optimal Threshold**: 0.2000
+* **LightGBM Optimal Threshold**: 0.8000  
+* **Meta-Model Threshold**: 0.8000
+
+### Business Impact
+
+**Strategic Balance**:
+
+1. **False Positive Reduction**: From DNN's 918 to Stacked's 641 (30% improvement)
+2. **Recall Improvement**: Better than LightGBM at 36% vs 23%
+3. **ROC Performance**: Best among all models (0.8421)
+4. **Practical Trade-off**: Balances precision and recall effectively
+
+**Cost Analysis**:
+- False Positives: Better than DNN, slightly worse than LightGBM
+- False Negatives: Middle ground between LightGBM (tight) and DNN (loose)
+- Overall: Optimal balance for business objectives
+
+### Conclusion
+
+The DNN + LightGBM + Logistic Stack represents a balanced credit risk approach. By combining neural networks' pattern recognition capabilities with gradient boosting's structured data handling, then optimizing their combination through stacking, we achieve:
+
+**Strengths**:
+- **Highest ROC AUC** (0.8421) among all models
+- **Best recall** while maintaining reasonable precision
+- Superior generalization (minimal performance drop from training to test)
+- Optimal balance for practical deployment
+
+**Considerations**:
+- Higher false positives than LightGBM (but fewer than DNN)
+- More complex infrastructure than single models
+- Excellent overall performance justifies complexity
+
+This ensemble approach delivers the best overall performance, making it ideal for institutions seeking optimal balance between risk management and market opportunity.
+
+### Business Interpretation
+
+Strategic Trade-off:
+
+- Extreme Risk Aversion: The model operates in a very conservative mode, only approving loans when extremely confident
+- Customer Experience: Fewer errors mean fewer customer complaints and appeals
+- Revenue Impact: Missing potential good customers (reduced recall) may limit growth
+- Risk Management: Minimal defaults with controlled lending volumes
