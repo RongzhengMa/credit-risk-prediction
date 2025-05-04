@@ -19,11 +19,11 @@ Evaluation: Model performance is assessed using ROC AUC, Precision-Recall AUC, F
 **Lasso Selected Features**: 41  
 **Classifier**: LinearSVC(class_weight='balanced', max_iter=1000)  
 **LinearSVC ROC AUC**: 0.7810  
-**Best F1 Threshold**: 0.4111  
-**Accuracy**:  0.7507  
-**Precision**: 0.0823  
-**Recall**:    0.6651  
-**F1 Score**:  0.1465  
+**Best F1 Threshold**: 0.5989  
+**Accuracy**:  0.7539  
+**Precision**: 0.0257  
+**Recall**:    0.6400
+**F1 Score**:  0.0494
 
 ### Feature Selection: Lasso
 
@@ -33,13 +33,13 @@ We used Lasso to select the most informative features. It selected 41 features. 
 
 ### Evaluation: Confusion Matrix
 
-The confusion matrix shows that while false positives are high, the model successfully identifies most default cases (recall ≈ 66.5%).
+The confusion matrix shows that while false positives are high, the model successfully identifies most default cases (recall ≈ 64%).
 
 ![Confusion Matrix](visualizations/svm_confusion_matrix.png)
 
 ### Evaluation: ROC Curve
 
-The ROC AUC on the test set is **0.78**, showing solid separability between default and non-default cases.
+The ROC AUC on the test set is **0.7981**, showing solid separability between default and non-default cases.
 
 ![ROC Curve](visualizations/svm_roc_lasso_selected.png)
 
@@ -51,11 +51,11 @@ Precision is low, but recall is high. This is expected due to class imbalance an
 
 ### Threshold Tuning
 
-F1 score peaks at threshold = **0.4111**, not the default 0.0. This balance improves rare event detection.
+F1 score peaks at threshold = **0.0494**.
 
 ![F1 vs Threshold](visualizations/svm_F1_score.png)
 
----
+
 
 ### Prediction Distribution
 
@@ -65,6 +65,7 @@ Below is the distribution of decision scores for the positive class.
 
 ### Conclusion
 This modeling pipeline combines Lasso regression for feature selection with a Linear Support Vector Classifier (LinearSVC) to predict credit default events in a highly imbalanced dataset. Lasso selected 41 informative features out of 63, helping reduce noise and improve model generalization. ROC and PR Curves indicate the model performs reasonably well in distinguishing classes, but struggles with precision due to class imbalance. Threshold tuning significantly improves recall while balancing economic cost.Lasso feature coefficients highlight key risk drivers.Prediction distribution shows most decision scores are near the threshold, emphasizing the need for careful cutoff selection.The model effectively identifies rare default events with high recall, crucial in risk-sensitive applications. However, low precision means further strategies (e.g., cost-aware loss functions, ensemble models) may be needed to reduce false positives.
+
 
 
 ## What Is a Neural Network?
