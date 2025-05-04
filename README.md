@@ -337,7 +337,7 @@ The DNN + LightGBM + Logistic Stack represents a balanced credit risk approach. 
 
 **Strengths**:
 - **Highest ROC AUC** (0.8421) among all models
-- **Great Accuracy and acceptable Recall with less Fewer Positive cases** while maintaining reasonable precision
+- **Great Accuracy and acceptable Recall with Fewer Positive cases** while maintaining reasonable precision
 - Superior generalization (minimal performance drop from training to test)
 - Optimal balance for practical deployment
 
