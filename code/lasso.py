@@ -24,7 +24,7 @@ svm = joblib.load("../output/model/linear_svc.pkl")
 # ===============================
 # Load and Prepare Test Data
 # ===============================
-df_test = pd.read_parquet("data/train_data.parquet")
+df_test = pd.read_parquet("data/test_data.parquet")
 print(f"Test data shape: {df_test.shape}")
 
 X_test = df_test.drop(columns=["case_id", "date_decision", "target"])
