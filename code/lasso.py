@@ -133,7 +133,6 @@ df_preds = pd.DataFrame({
     "actual_label": y_true.values
 })
 
-# 保存完整预测结果
 df_preds.to_csv("result/submission_lasso_svm.csv", index=False)
 
 
