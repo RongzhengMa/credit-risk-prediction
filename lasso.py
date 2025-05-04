@@ -34,7 +34,7 @@ print(f"Lasso ROC AUC: {lasso_auc:.4f}")
 
 # ========== Step 6: Use Lasso-selected features in SVM ==========
 selected_features = X.columns[lasso.coef_ != 0]
-print(f"📌 Lasso selected {len(selected_features)} features.")
+print(f" Lasso selected {len(selected_features)} features.")
 
 X_selected = X[selected_features]
 X_train_sel, X_val_sel, y_train_sel, y_val_sel = train_test_split(
@@ -55,14 +55,14 @@ try:
     print("Predicted probability (min, max, mean):",
           round(y_pred_svm.min(), 4), round(y_pred_svm.max(), 4), round(y_pred_svm.mean(), 4))
 except Exception as e:
-    print("❌ SVM training failed.")
+    print(" SVM training failed.")
     print("Reason:", str(e))
     svm_auc = None
     y_pred_svm = None
 
 # ========== Step 7: Visualizations ==========
 
-# 📊 1. Lasso Coefficient Bar Chart
+# 1. Lasso Coefficient Bar Chart
 coeffs = lasso.coef_
 features = X.columns
 nonzero_idx = coeffs != 0
@@ -76,7 +76,7 @@ plt.tight_layout()
 plt.savefig("lasso_features.png")
 plt.close()
 
-# 📈 2. Lasso ROC Curve
+# 2. Lasso ROC Curve
 fpr, tpr, _ = roc_curve(y_val, y_pred_lasso)
 plt.figure(figsize=(6, 4))
 plt.plot(fpr, tpr, label=f"Lasso (AUC = {lasso_auc:.2f})")
@@ -90,7 +90,7 @@ plt.tight_layout()
 plt.savefig("lasso_roc.png")
 plt.close()
 
-# 📉 3. Lasso Prediction Distribution
+# 3. Lasso Prediction Distribution
 plt.figure(figsize=(6, 4))
 plt.hist(y_pred_lasso, bins=50, color='orange')
 plt.title("Lasso Prediction Distribution")
@@ -100,7 +100,7 @@ plt.tight_layout()
 plt.savefig("lasso_pred_dist.png")
 plt.close()
 
-# 🔍 4. Lasso Scatter: Predicted vs True
+# 4. Lasso Scatter: Predicted vs True
 plt.figure(figsize=(6, 4))
 plt.scatter(y_val, y_pred_lasso, alpha=0.3)
 plt.xlabel("True TARGET")
@@ -111,7 +111,7 @@ plt.tight_layout()
 plt.savefig("lasso_scatter_truth.png")
 plt.close()
 
-# 📈 5. SVM ROC Curve (Lasso-selected features) - only if success
+# 5. SVM ROC Curve (Lasso-selected features) - only if success
 if y_pred_svm is not None:
     fpr_svm, tpr_svm, _ = roc_curve(y_val_sel, y_pred_svm)
     plt.figure(figsize=(6, 4))
@@ -126,7 +126,7 @@ if y_pred_svm is not None:
     plt.savefig("svm_roc_lasso_selected.png")
     plt.close()
 
-print("✅ All charts saved:")
+print("All charts saved:")
 print("- lasso_features.png")
 print("- lasso_roc.png")
 print("- lasso_pred_dist.png")
