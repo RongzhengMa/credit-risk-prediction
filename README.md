@@ -21,9 +21,9 @@ This neural network consists of three layers: two hidden layers (64 and 32 units
 
   * Hidden layers use **swish**, defined as:
 
-    $$
-    f(x) = x \cdot \sigma(x) = \frac{x}{1 + e^{-x}}
-    $$
+ $$
+ f(x) = x \cdot \sigma(x) = \frac{x}{1 + e^{-x}}
+ $$
 
     Swish is smooth and non-monotonic, offering better gradient flow than ReLU in many cases.
 
@@ -63,9 +63,9 @@ To reflect this, we define two economic indices:
 
 * **Expected Loss Index (ELI)** for bad users:
 
-  $$
-  \text{ELI} = \text{EAD} \times \text{LGD} \times \text{PD}
-  $$
+$$
+\text{ELI} = \text{EAD} \times \text{LGD} \times \text{PD}
+$$
 
   where EAD is exposure, LGD is potential loss rate, and PD is default probability.
 
