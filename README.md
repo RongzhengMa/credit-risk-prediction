@@ -309,6 +309,7 @@ LightGBM’s scalability and speed also make it an excellent choice for deployin
 
 
 
+Using the python3 neural_network.py and neural_network_training.py on the cmd to run the data.
 
 ## What Is a Neural Network?
 
