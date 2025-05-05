@@ -508,14 +508,6 @@ The pipeline works in two stages: First, DNN and LightGBM independently learn di
 **Test Recall**: 0.3600  
 **Test F1 Score**: 0.0927
 
-### **Key Performance Characteristics**
-
-The stacked model achieves:
-- **Acceptable recall among all models** (0.36 vs LightGBM's 0.23 and DNN's 0.39)
-- **Significant false positive reduction** (641 vs DNN's 918)
-- **Highest AUC-PR** 
-- **Highest F1 Score**
-
 ### Evaluation: Confusion Matrix
 
 **Test Set Performance**:
