@@ -60,6 +60,7 @@ Finally, we obtained aggregated feature tables for Depth 1 and Depth 2, then mer
 * Selected the top 60 most important features based on LightGBM's final training importance scores.
 
 ## Lasso + SVC
+Using the python3 `lasso.py` and `lasso_training.py` on the cmd to run the data.
 ### What is Lasso + SVC?
 This model pipeline combines Lasso regression for feature selection with Linear Support Vector Classification (LinearSVC) for prediction. It is designed to handle high-dimensional, imbalanced classification problems efficiently.
 Lasso acts as a filter to automatically drop irrelevant features by penalizing their coefficients, shrinking many of them to zero. The reduced feature set is then used by LinearSVC, which is optimized for speed and scalability on large datasets. By combining the two, we achieve both interpretability and efficient computation — critical for real-world applications like credit risk scoring.
