@@ -578,11 +578,11 @@ The meta-model enables sophisticated threshold tuning:
 * **LightGBM Optimal Threshold**: 0.8000  
 * **Meta-Model Threshold**: 0.8000
 
-1. **False Positive Reduction**: From DNN's 918 to Stacked's 641 (30% improvement)
-2. **Highest AUC-PR**: Improved by 10.9% (vs LightGBM's 0.0497)
-3. **Highest F1**
-4. **Highest AUC-ROC Performance**: Best among all models (0.8421)
-5. **Practical Trade-off**: Balances precision and recall effectively
+* **False Positive Reduction**: From DNN's 918 to Stacked's 641 (30% improvement)
+* **Highest AUC-PR**: Improved by 10.9% (vs LightGBM's 0.0497)
+* **Highest F1**
+* **Highest AUC-ROC Performance**: Best among all models (0.8421)
+* **Practical Trade-off**: Balances precision and recall effectively
 
 ### Conclusion
 
