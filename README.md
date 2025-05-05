@@ -586,20 +586,11 @@ The meta-model enables sophisticated threshold tuning:
 * **LightGBM Optimal Threshold**: 0.8000  
 * **Meta-Model Threshold**: 0.8000
 
-### Business Impact
-
-**Strategic Balance**:
-
 1. **False Positive Reduction**: From DNN's 918 to Stacked's 641 (30% improvement)
 2. **Highest AUC-PR**: Improved by 10.9% (vs LightGBM's 0.0497)
 3. **Highest F1**
 4. **Highest AUC-ROC Performance**: Best among all models (0.8421)
 5. **Practical Trade-off**: Balances precision and recall effectively
-
-**Cost Analysis**:
-- False Positives: Better than DNN, slightly worse than LightGBM
-- False Negatives: Middle ground between LightGBM (tight) and DNN (loose)
-- Overall: Optimal balance for business objectives
 
 ### Conclusion
 
@@ -607,8 +598,7 @@ The DNN + LightGBM + Logistic Stack represents a balanced credit risk approach. 
 
 **Strengths**:
 - **Highest ROC AUC** (0.8421) among all models
-- **Great Accuracy and acceptable Recall with Fewer False Positive cases** while maintaining reasonable precision
-- Superior generalization (minimal performance drop from training to test)
+- **Great Accuracy and acceptable Recall with Fewer False Positive cases** while maintaining best precision
 - Optimal balance for practical deployment
 
 **Considerations**:
