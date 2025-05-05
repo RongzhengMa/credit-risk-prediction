@@ -1,4 +1,64 @@
 # credit-risk-prediction
+### Group Name: Cheesecake   
+### Group Member: Yuan Gao, Rongzheng Ma, Tianyi Ma, Huiwen Lian, and Yishan Yuan   
+
+# Background of the project
+
+In the consumer finance industry, lenders must decide whether to approve a loan based on limited information provided at the time of application. Traditionally, this decision heavily relies on the applicant’s credit history, which may be unavailable or insufficient for many individuals, such as young people or those who rely on cash. With the growth of alternative data sources, such as behavioral attributes and application-level features, it becomes possible to assess credit risk more broadly. This project addresses the challenge of building a predictive model that can estimate the likelihood of default using only the information available before the loan is issued.
+
+# Goal of the project
+
+The objective of this project is to build a machine learning model that predicts the probability of loan default at the point of application. The model leverages various applicant features—demographics, payment behavior summaries, application-level data, and external credit data—available before any loan is issued. We focus purely on static, pre-loan features to support real-time credit decision-making. By accurately identifying high-risk applicants early, lenders can reduce default rates and improve financial inclusion for underbanked populations.
+
+# Source of dataset
+
+The dataset is provided by Home Credit through a Kaggle competition (https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/overview). It includes anonymized, structured information collected during loan applications. The data is divided into several depth levels, each corresponding to features aggregated at different granularities. It comprises internal customer attributes, external credit bureau records, and basic demographic information. Most variables are available at the time of the loan application.
+
+# Limitation of data
+
+* While some descriptions provide basic context, they still lack detailed definitions or calculation formulas. This can make it difficult to determine whether variables are redundant, correlated, or overlapping.
+* Missing values are prevalent, and the dataset doesn’t specify whether missingness is structural or random. Misinterpreting missingness may bias the model.
+* The dataset lacks clear timestamp alignment, even though variables reference historical behavior. This may limit precise sequencing or trend analysis, even within the static pre-loan snapshot.
+
+# Work Flow
+
+Data merge -> Feature Engineering -> 5 types of Models -> Evaluation
+
+## Feature Engineering
+
+### Data structure and merge
+depth=0 - These are static features directly tied to a specific case_id   
+depth=1 - Each has an associated historical record, indexed by case_id num_group1   
+depth=2 - Each has an associated historical record, indexed by both case_id num_group1 num_group2  
+For example, a person may have multiple past loans, and each of these loan records corresponds to Depth 1 data. Then, for each loan, there are detailed transactional records such as individual repayment events, which can be considered Depth 2 data.
+
+Totally 465 features in these data, for depth 2 data, we first merged the static data, including application form features and credit bureau summary tables. Then, for Depth 1 and Depth 2 datasets, we applied customised aggregation rules based on feature suffixes. The specific operations are as follows:
+
+<div align="center">
+
+| Feature Suffix | Assumed Type            | Aggregation Strategy                        |
+|:--------------:|:-----------------------:|:-------------------------------------------:|
+| `P`, `A`       | Numeric (payments, amounts) | mean, max, min, std                     |
+| `D`            | Date                     | diff            |
+| `M`            | Categorical or ID-like   | first, last, nunique                       |
+| `L`, `T`       | Count or frequency       | sum, max, min                              |
+| `num_group`    | Group identifier         | max, nunique                               |
+| *Other*        | Undefined or skipped     | No aggregation or default handling applied |
+
+</div>
+
+Finally, we obtained aggregated feature tables for Depth 1 and Depth 2, then merged them into the final dataset based on case_id.
+
+### Feature construction
+* Formula-based Features: Ratio metrics reflecting financial burden like: debt_pressure_index = (currentdebt + debtoverdue) / income.
+* Date-difference Features: Time gaps (in days) between a reference date and key events.
+* RFM-style Features: Behavioral metrics to capture recency(how long ago the customer last took key credit-related actions), frequency(how often a customer engages in financial actions), and monetary(the financial weight and risk by evaluating debt ratios, loan size relative to income, and repayment behavior).
+
+### Feature selection
+* Null Importance Filtering: Compared real LightGBM feature importance with null (shuffled target) importance to retain features significantly more informative than noise.
+* Adversarial Validation: Tested if features can distinguish between time-based data splits. Features that generalized well across time were retained.
+* Selected the top 60 most important features based on LightGBM's final training importance scores.
+
 ## Lasso + SVC
 ### What is Lasso + SVC?
 This model pipeline combines Lasso regression for feature selection with Linear Support Vector Classification (LinearSVC) for prediction. It is designed to handle high-dimensional, imbalanced classification problems efficiently.
