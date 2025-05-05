@@ -238,10 +238,14 @@ Training stopped at **epoch 48** with automatic learning rate reduction. Final m
 
 We used expected loss (ELI) and benefit (BI) to reflect real-world costs:
 
+<div align="center">
+
 | User Type     | Avg. Loss Index (ELI) | Avg. Benefit Index (BI) | Count   |
 | ------------- | --------------------- | ----------------------- | ------- |
 | Good User (0) | 0.0377                | 0.0262                  | 464,748 |
 | Bad User (1)  | 0.0546                | 0.0408                  | 15,450  |
+
+</div>
 
 * **Optimal threshold** (economic cost minimized): **0.518**
 * **Minimum total cost**: **779.51 (normalized units)**
@@ -330,37 +334,59 @@ The stacked model achieves:
 ### Evaluation: Confusion Matrix
 
 **Test Set Performance**:
+
+<div align="center">
+
 | Model | False Positives | True Positives | False Negatives | True Negatives |
 |-------|----------------|----------------|-----------------|----------------|
 | LightGBM | 424 | 23 | 77 | 9476 |
 | DNN | 918 | 39 | 61 | 8982 |
 | Stacked | 641 | 36 | 64 | 9259 |
 
-![stacked_model_(test)_confusion_matrix](https://github.com/user-attachments/assets/662044e5-0b3f-4b6a-bf8b-03dfb60d15c1)
+</div>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/662044e5-0b3f-4b6a-bf8b-03dfb60d15c1" alt="stacked_model_(test)_confusion_matrix">
+</p>
+
 
 ### Evaluation: AUC-ROC Curve
 
-![stacked_model_(training)_roc_curve](https://github.com/user-attachments/assets/51a879b3-5363-4254-99cc-84316d3bf884)
-![stacked_model_(test)_roc_curve](https://github.com/user-attachments/assets/71a51e54-fab8-488b-acbf-42010941cbd0)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/51a879b3-5363-4254-99cc-84316d3bf884" alt="stacked_model_(training)_roc_curve">
+</p>
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/71a51e54-fab8-488b-acbf-42010941cbd0" alt="stacked_model_(test)_roc_curve">
+</p>
 
 ### Model Comparison
 
 Individual components and stacked ensemble performance comparison:
 
 **Test Set Performance**:
+
+<div align="center">
+
 | Model | ROC AUC | PR AUC | Precision | Recall | F1 Score | FNR |
 |-------|---------|--------|-----------|--------|----------|-----|
 | LightGBM | 0.8403 | 0.0497 | 0.0515 | 0.2300 | 0.0841 | 77% |
 | DNN | 0.7861 | 0.0386 | 0.0408 | 0.3900 | 0.0738 | 61% |
 | Stacked | **0.8421** | **0.0551** | **0.0532** | 0.3600 | **0.0927** | 64% |
 
+</div>
+
 **Training Set Performance**:
+
+<div align="center">
+
 | Model | ROC AUC | PR AUC | Precision | Recall | F1 Score | FNR |
 |-------|---------|--------|-----------|--------|----------|-----|
 | LightGBM | 0.8585 | 0.2088 | 0.2281 | 0.3454 | 0.2747 | 65.5% |
 | DNN | 0.7718 | 0.1018 | 0.1095 | 0.3515 | 0.1670 | 64.9% |
 | Stacked | 0.8573 | 0.2035 | 0.1919 | 0.4360 | 0.2665 | 56.4% |
+
+</div>
 
 Key insights:
 - LightGBM achieves highest precision but lowest recall
@@ -415,3 +441,83 @@ Strategic Trade-off:
 - Customer Experience: Fewer errors mean fewer customer complaints and appeals
 - Revenue Impact: Missing potential good customers (reduced recall) may limit growth
 - Risk Management: Minimal defaults with controlled lending volumes
+
+## Evaluation
+
+### Accuracy
+
+Accuracy measures the proportion of correctly classified instances among the total instances:
+
+$$
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+$$
+
+### Precision
+Precision, also known as Positive Predictive Value (PPV), is the fraction of relevant instances among the retrieved instances:
+
+$$
+\text{Precision} = \frac{TP}{TP + FP}
+$$
+
+### Recall
+Recall, also known as Sensitivity or True Positive Rate (TPR), measures the ability of the model to capture positive instances:
+
+$$
+\text{Recall} = \frac{TP}{TP + FN}
+$$
+
+### Area Under the ROC Curve (AUC)
+
+AUC measures the area under the Receiver Operating Characteristic (ROC) curve, which plots TPR against False Positive Rate (FPR):
+
+$$
+\text{AUC} = \int_0^1 TPR(FPR) \, dFPR
+$$
+
+where:
+
+$$
+\text{FPR} = \frac{FP}{FP + TN}
+$$
+
+### Kolmogorov–Smirnov Statistic (KS)
+
+The Kolmogorov–Smirnov (KS) statistic measures the maximum distance between the cumulative distribution functions of the predicted scores for the positive class and the negative class. It quantifies how well a binary classifier distinguishes between the two classes:
+
+$$
+KS = \max_x \left| F_1(x) - F_0(x) \right|
+$$
+
+Where:
+
+- \( F_1(x) \) is the cumulative distribution function (CDF) of the positive class
+- \( F_0(x) \) is the cumulative distribution function (CDF) of the negative class
+
+### Best model
+
+<div align="center">
+
+| Model     | Accuracy | Precision | Recall | AUC    | KS     |
+|:---------:|:--------:|:---------:|:------:|:------:|:------:|
+| SVM       | 0.7524   | 0.0261    | 0.64   | 0.6968 | 0.4737 |
+| Networks  | 0.7465   | 0.0285    | 0.72   | 0.7334 | 0.4937 |
+| LightGBM  | 0.9111   | 0.0350    | 0.29   | 0.6038 | 0.4236 |
+| Catboost  | 0.9416   | 0.0547    | 0.29   | 0.6192 | 0.5731 |
+| Staking   | 0.9286   | 0.0536    | 0.36   | 0.6472 | 0.3102 |
+
+</div>
+
+Overall, two models appear to be viable. The first is the neural network model, which achieves a high recall, meaning it is capable of identifying most of the potential defaulters. However, it has low precision, indicating that many good customers may be mistakenly flagged as risky. This makes the model's screening strategy relatively aggressive. The second is the CatBoost model, which achieves higher precision, effectively identifying customers with poor creditworthiness. Its high KS score also demonstrates strong discriminatory power, making it well-suited for risk segmentation, such as rejecting high-risk borrowers, limiting credit for medium-risk individuals, and approving low-risk clients.
+
+Given the practical background of this project, financial institutions must both reduce credit losses by identifying high-risk customers before disbursing loans and maintain a reasonable approval rate to support business volume. Therefore, a two-stage model deployment strategy is recommended. The neural network can serve as the initial screening tool to capture a broad range of potential defaulters. CatBoost can then be used for precise risk scoring, allowing for more accurate identification of high-risk customers. Its strong KS score also enables effective risk-based customer segmentation, supporting differentiated lending decisions such as loan rejection or credit limit adjustment.
+
+## Limitation and Extension
+
+* Temporal data can be used to track a user's continuous behavior over time, which helps ensure both the stability and accuracy of the model.
+* Due to limitations in computing resources and time, only a limited number of features were used, with 60 features selected for modelling.
+* Because of hardware constraints, 490,000 samples were randomly selected from the original 1.5 million records for training, which may have further exacerbated class imbalance during sampling.
+* During model training, the dataset was split into training and testing sets. Given the extreme class imbalance (approximately 100:3), the number of positive samples in both sets may have been insufficient, potentially impacting model performance.
+
+
+
+
