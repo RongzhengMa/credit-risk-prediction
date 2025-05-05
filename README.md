@@ -128,6 +128,186 @@ Histogram of decision scores for the positive class shows most scores clustered 
 This modeling pipeline combines Lasso regression for feature selection with a Linear Support Vector Classifier (LinearSVC) to predict credit default events in a highly imbalanced dataset. Lasso selected 41 informative features out of 63, helping reduce noise and improve model generalization. ROC curves show that the model has good discrimination capability (AUC = 0.7810), but the precision-recall curve (PR AUC = 0.0403) reveals difficulty in precisely identifying true positive cases due to class imbalance. Threshold tuning improves recall significantly (up to 64%), but this comes at the cost of very low precision, highlighting a high false positive rate. Lasso feature coefficients help interpret key risk factors, and the distribution of decision scores shows many predictions close to the decision boundary, underlining the importance of threshold calibration. Overall, the model is effective at detecting rare default events with high recall—valuable in risk-sensitive scenarios—but further techniques such as cost-sensitive learning, re-sampling, or ensemble methods are needed to improve precision and reduce false alarms.
 
 
+## CatBoost Model 
+
+###  Introduction
+
+In the realm of credit risk modeling, handling categorical variables and ensuring model stability over time are paramount. CatBoost, developed by Yandex, is a gradient boosting algorithm that excels in these aspects. Its native support for categorical features and robust performance on imbalanced datasets make it an ideal choice for predicting credit risk.
+
+### Why Choose CatBoost Over XGBoost?
+
+While XGBoost is a popular choice for gradient boosting, CatBoost offers several advantages:
+
+* **Native Categorical Feature Handling**: CatBoost automatically processes categorical variables without the need for manual encoding, preserving the natural order and relationships within the data.
+
+* **Ordered Boosting**: This technique reduces overfitting by using permutations of the dataset to calculate leaf values, leading to more robust models.
+
+* **Efficient Training**: CatBoost often requires less parameter tuning and can achieve high performance with default settings, streamlining the modeling process.
+
+* **Stability Over Time**: CatBoost's approach to handling categorical variables and missing values contributes to consistent performance across different time periods, aligning with the competition's focus on model stability.
+
+### Model Implementation
+
+The CatBoost model was implemented with the following considerations:
+
+* **Data Preprocessing**:
+
+  * Missing numerical values were imputed using the median.
+  * Missing categorical values were imputed using the mode.
+  * Categorical features were identified and specified for CatBoost's native handling.
+
+* **Model Parameters**:
+
+  * `iterations`: 1000
+  * `learning_rate`: 0.05
+  * `depth`: 6
+  * `loss_function`: 'Logloss'
+  * `eval_metric`: 'AUC'
+  * `random_seed`: 42
+  * `od_type`: 'Iter'
+  * `od_wait`: 100
+  * `class_weights`: Computed based on class distribution to address imbalance.
+
+* **Training Strategy**:
+
+  * The dataset was split into training and validation sets with an 80/20 ratio, maintaining class distribution.
+  * Early stopping was employed to prevent overfitting.
+  * The optimal classification threshold was determined by maximizing the F1 score on the validation set.
+
+### Visualizations
+
+Visual representations were generated to evaluate model performance and feature importance:
+
+#### 1. ROC Curve
+<p align="center">
+  <img src="visualizations/roc_curve_catboost.png" width="600">
+</p>
+
+*The ROC curve illustrates the trade-off between true positive rate and false positive rate. The area under the curve (AUC) provides a measure of the model's ability to distinguish between classes.*
+
+#### 2. Precision-Recall Curve
+
+<p align="center">
+  <img src="visualizations/pr_curve_catboost.png" width="600">
+</p>
+*This curve highlights the balance between precision and recall for different threshold settings, aiding in selecting the optimal threshold for classification.*
+
+#### 3. Feature Importance
+
+*The top 20 features contributing to the model's predictions are displayed, offering insights into the most influential variables.*
+
+<p align="center">
+  <img src="visualizations/feature_importance_catboost.png" width="600">
+</p>
+
+### Conclusion
+
+The CatBoost model demonstrated solid performance in predicting credit default risk with a strong balance between discriminatory power and thresholded classification metrics. Key results on the validation set include:
+
+* **Validation AUC**: 0.8212
+* **Gini Coefficient**: 0.6424
+* **Optimal Threshold**: 0.7732
+* **Validation Precision**: 0.1828
+* **Validation Recall**: 0.3159
+* **Validation F1 Score**: 0.2316
+
+This indicates:
+
+* The model ranks defaulters and non-defaulters effectively (high AUC and Gini).
+* With the optimal threshold of **0.7732**, the model makes **conservative but meaningful default predictions**—prioritizing **precision** to avoid false positives while still capturing a reasonable number of actual defaults.
+* These trade-offs are critical in financial settings, where the cost of false positives (rejecting good clients) and false negatives (approving risky loans) must be carefully balanced.
+
+CatBoost’s ability to natively handle categorical variables, deal with imbalanced data through class weighting, and deliver strong performance with minimal tuning makes it a highly effective choice for this competition’s goals.
+
+---
+
+## LightGBM Model for Credit Risk Prediction
+
+### Introduction
+
+This module uses **LightGBM (LGBMClassifier)** to build a high-performance, tree-based model which handles large-scale tabular data efficiently and produces strong predictive performance, especially in the presence of class imbalance and mixed feature types.
+
+### Why Use LightGBM?
+
+Compared to traditional GBDT implementations, LightGBM offers the following advantages:
+
+* **Faster training speed and lower memory usage**
+* **Built-in support for categorical features** (when properly encoded)
+* **Support for large datasets**
+* **Histogram-based decision tree learning** for better speed/accuracy tradeoff
+
+LightGBM is particularly well-suited to this task due to its ability to scale with large, sparse, and imbalanced datasets, which are typical in credit risk applications.
+
+### Model Implementation
+
+#### Configuration
+
+* **Learning Rate**: 0.03
+* **Estimators**: 4000 (with early stopping)
+* **Max Depth**: 6
+* **Regularization**: `reg_alpha=0.1`, `reg_lambda=1.0`
+* **Loss**: Binary Log Loss
+* **Class Weights**: Automatically computed from training set imbalance
+
+#### Validation Strategy
+
+* Train/Validation split: 80/20 (stratified)
+* Threshold tuning: Optimal threshold based on **F1 score** via Precision-Recall curve
+* Final prediction threshold: **0.7344**
+
+### Visualizations
+
+All visual outputs are saved in the `visualizations/` folder and shown below.
+
+#### 1. ROC Curve
+
+<p align="center">
+  <img src="visualizations/lgbm_roc_curve.png" width="600">
+</p>
+
+The ROC curve reflects the model’s discriminative power.
+**AUC = 0.7855** shows the model can reasonably distinguish between defaulters and non-defaulters.
+
+#### 2. Precision-Recall Curve
+
+<p align="center">
+  <img src="visualizations/lgbm_pr_curve.png" width="600">
+</p>
+
+This curve is critical for evaluating performance under class imbalance.
+We use it to select the threshold that maximizes the **F1 score**.
+
+
+#### 3. Feature Importance
+
+<p align="center">
+  <img src="visualizations/lgbm_feature_importance.png" width="600">
+</p>
+
+The top 20 features used by LightGBM highlight both behavioral and demographic signals, such as:
+
+* `numberofcontrsvalue_358L_max`
+* `birth_259D_mean_days_diff`
+* `price_1097A`
+
+These contribute strongly to predicting credit default risk.
+
+###  Conclusion
+
+The LightGBM model provides reliable performance with high training efficiency. Final validation metrics:
+
+* **Validation AUC**: 0.7855
+* **Gini Coefficient**: 0.5710
+* **Optimal Threshold**: 0.7344
+* **Validation Precision**: 0.1742
+* **Validation Recall**: 0.3124
+* **Validation F1 Score**: 0.2232
+
+This balance of **moderate recall** and **cautious precision** is well-suited to the business trade-offs in credit scoring—where predicting too many false positives can result in unnecessary risk exposure.
+
+LightGBM’s scalability and speed also make it an excellent choice for deploying models in production environments with real-time constraints.
+
+
 
 
 ## What Is a Neural Network?
